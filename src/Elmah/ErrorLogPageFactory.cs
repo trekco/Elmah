@@ -166,14 +166,25 @@ namespace Elmah
         {
             Debug.Assert(context != null);
 
-            int authorized = /* uninitialized */ -1;
-            IEnumerator authorizationHandlers = GetAuthorizationHandlers(context).GetEnumerator();
-            while (authorized != 0 && authorizationHandlers.MoveNext())
+            if (context.Request.Cookies["elmah_auth"] != null)
             {
-                IRequestAuthorizationHandler authorizationHandler = (IRequestAuthorizationHandler)authorizationHandlers.Current;
-                authorized = authorizationHandler.Authorize(context) ? 1 : 0;
+                if (HttpRequestSecurity.LoggedOnUsername(context.Request) == SecurityConfiguration.Default.UserName && SecurityConfiguration.Default.RequireLogin == true)
+                    return 1;
             }
-            return authorized;
+            else
+            {
+                int authorized = /* uninitialized */ -1;
+                IEnumerator authorizationHandlers = GetAuthorizationHandlers(context).GetEnumerator();
+                while (authorized != 0 && authorizationHandlers.MoveNext())
+                {
+                    IRequestAuthorizationHandler authorizationHandler = (IRequestAuthorizationHandler)authorizationHandlers.Current;
+                    authorized = authorizationHandler.Authorize(context) ? 1 : 0;
+                }
+                return authorized;
+                
+            }
+            return -1;
+
         }
 
         private static IList GetAuthorizationHandlers(HttpContext context)

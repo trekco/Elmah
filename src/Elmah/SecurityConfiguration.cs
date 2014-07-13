@@ -42,6 +42,7 @@ namespace Elmah
         private readonly string _userName;
         private readonly string _password;
         private readonly string _encryptionSalt;
+        private readonly string _encryptionSecret;
         private readonly bool _requireLogin;
         private readonly int _blockFailedAttempts;
 
@@ -60,7 +61,8 @@ namespace Elmah
             _requireLogin = GetBoolean(options, "requireLogin");
             _blockFailedAttempts = GetInteger(options, "blockFailedAttempts");
             _encryptionSalt = GetString(options, "encryptionSalt");
-            
+            _encryptionSecret = GetString(options, "encryptionSecret");
+
             if (_blockFailedAttempts == 0) _blockFailedAttempts = 3;
         }
         
@@ -77,6 +79,11 @@ namespace Elmah
         public string EncryptionSalt
         {
             get { return _encryptionSalt; }
+        }
+
+        public string EncryptionSecret
+        {
+            get { return _encryptionSecret; }
         }
         public string Password
         {

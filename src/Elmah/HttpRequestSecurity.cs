@@ -65,13 +65,13 @@ namespace Elmah
 
         public static string LoggedOnUsername(HttpRequest request)
         {
-            HttpCookie userCookie = request.Cookies["elmah_user"];
+            HttpCookie userCookie = request.Cookies["elmah_auth"];
 
             if (userCookie == null) return string.Empty;
 
             try
             {
-                return StrEncrypt.DecryptStringAES(userCookie.Value, SecurityConfiguration.Default.Password, SecurityConfiguration.Default.EncryptionSalt);
+                return StrEncrypt.DecryptStringAES(userCookie.Value, SecurityConfiguration.Default.EncryptionSecret, SecurityConfiguration.Default.EncryptionSalt + SecurityConfiguration.Default.Password);
             }catch
             {
                 return string.Empty;
@@ -83,7 +83,7 @@ namespace Elmah
         {
             HttpCookie userCookie = new HttpCookie("elmah_auth");
 
-            userCookie.Value = StrEncrypt.EncryptStringAES(username, SecurityConfiguration.Default.Password, SecurityConfiguration.Default.EncryptionSalt);
+            userCookie.Value = StrEncrypt.EncryptStringAES(username, SecurityConfiguration.Default.EncryptionSecret, SecurityConfiguration.Default.EncryptionSalt + SecurityConfiguration.Default.Password);
 
             context.Response.Cookies.Add(userCookie);
             
